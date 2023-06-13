@@ -4,7 +4,7 @@ import * as sinon from 'sinon';
 import chaiHttp = require('chai-http');
 
 import { app } from '../app';
-import TeamModel from '../database/models/TeamsModel';
+import TeamsModel from '../database/models/TeamsModel';
 import TeamsService from '../services/TeamsService';
 
 import { Model } from 'sequelize';
@@ -13,9 +13,9 @@ chai.use(chaiHttp);
 
 const { expect, request } = chai;
 
-const listTeamsMock: TeamModel[] = [
-  new TeamModel({ id: 1, teamName: 'Remo', }),
-  new TeamModel({ id: 2, teamName: 'Paysandu', }),
+const listTeamsMock: TeamsModel[] = [
+  new TeamsModel({ id: 1, teamName: 'Remo', }),
+  new TeamsModel({ id: 2, teamName: 'Paysandu', }),
 ];
 
 describe('Should be returned all the teams', () => {
