@@ -1,6 +1,7 @@
 # Usar a imagem node:16.14-alpine como base
 FROM node:16.14-alpine
 
+FROM node:16.14-alpine
 # Mudar para o diretório de trabalho /app-backend
 WORKDIR /app-backend
 
