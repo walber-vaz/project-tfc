@@ -1,92 +1,131 @@
 import * as sinon from 'sinon';
 import * as chai from 'chai';
-import * as bcrypt from 'bcryptjs';
+import { app } from '../../src/app';
+import {
+  isInvalidEmailLoginBody,
+  isInvalidLoginBody,
+  isInvalidPasswordLoginBody,
+  isLoginWithoutEmail,
+  isLoginWithoutPassword,
+  isValidLoginBody,
+  userRegistered,
+  wrongPasswordUser
+} from './mocks/Login.mock';
+import Token from '../api/utils/token';
+import Validations from '../api/middlewares/validations';
 // @ts-ignore
 import chaiHttp = require('chai-http');
-
-import { app } from '../app';
-import UserModel from '../database/models/UserModel';
-
-import { Model } from 'sequelize';
+import User from '../../src/database/models/SequelizeUser';
 
 chai.use(chaiHttp);
 
-const { expect, request } = chai;
+const { expect } = chai;
 
 describe('Should be able to login', () => {
-  beforeEach(sinon.restore);
-
-  const user = new UserModel({
-    id: 1,
-    username: 'Xablau',
-    role: 'admin',
-    email: 'email@email.com',
-    password: '123456'
-  })
-
-  it('Must return a token', async () => {
-    const body = { email: 'email@email.com', password: '123456'}
-
-    sinon.stub(Model, 'findOne').resolves(user);
-    
-    sinon.stub(bcrypt, 'compareSync').resolves(true);
-
-    const result = await request(app).post('/login').send(body);
-
-    expect(result.status).to.be.equal(200);
-
-    expect(result.body).to.haveOwnProperty('token');
+  it('Must be able to login', async () => {
+    sinon.stub(User, 'findOne').resolves(userRegistered as any);
+    sinon.stub(Token, 'sign').returns('validToken');
+    sinon.stub(Validations, 'login').returns();
+    const { status, body } = await chai.request(app)
+      .post('/login')
+      .send(isValidLoginBody);
+    expect(status).to.be.equal(200);
+    expect(body).to.have.key('token');
   });
 
-  it('Must return an error if password is empty', async () => {
-    const body = { email: 'email@email.com', password: ''}
-
-    sinon.stub(Model, 'findOne').resolves(user);
-
-    sinon.stub(bcrypt, 'compareSync').resolves(true);
-
-    const result = await request(app).post('/login').send(body);
-
-    expect(result.status).to.be.equal(400);
-
-    expect(result.body).to.deep.equal({ message: 'All fields must be filled'})
+  it('Not be able to login without email', async () => {
+    const { status, body } = await chai.request(app)
+      .post('/login')
+      .send(isLoginWithoutEmail);
+    expect(status).to.be.equal(400);
+    expect(body).to.be.deep.equal({ message: 'All fields must be filled' });
   });
 
-  it('Must return an error if password is wrong', async () => {
-    const body = { email: 'email@email.com', password: '13'}
-
-    sinon.stub(Model, 'findOne').resolves(user);
-
-    const result = await request(app).post('/login').send(body);
-
-    expect(result.status).to.be.equal(401);
-
-    expect(result.body).to.deep.equal({ message: 'Invalid email or password'})
+  it('Not be able to login without password', async () => {
+    const { status, body } = await chai.request(app)
+      .post('/login')
+      .send(isLoginWithoutPassword);
+    expect(status).to.be.equal(400);
+    expect(body.message).to.be.equal('All fields must be filled');
   });
 
-  it('Must return an error if email is empty', async () => {
-    const body = { email: '', password: '123456'}
-
-    sinon.stub(Model, 'findOne').resolves(user);
-
-    sinon.stub(bcrypt, 'compareSync').resolves(true);
-
-    const result = await request(app).post('/login').send(body);
-
-    expect(result.status).to.be.equal(400);
-
-    expect(result.body).to.deep.equal({ message: 'All fields must be filled'})
+  it('Not login in email invalid', async () => {
+    const { status, body } = await chai.request(app)
+      .post('/login')
+      .send(isInvalidEmailLoginBody);
+    expect(status).to.be.equal(401);
+    expect(body.message).to.be.equal('Invalid email or password');
   });
 
-  it('Must return an error if email is wrong', async () => {
-    const body = { email: 'email', password: '123456'}
-
-    sinon.stub(Model, 'findOne').resolves(null);
-
-    const result = await request(app).post('/login').send(body);
-
-    expect(result.status).to.be.equal(401);
-
-    expect(result.body).to.deep.equal({ message: 'Invalid email or password'})
+  it('Not login in password invalid', async () => {
+    const { status, body } = await chai.request(app)
+      .post('/login')
+      .send(isInvalidPasswordLoginBody);
+    expect(status).to.be.equal(401);
+    expect(body.message).to.be.equal('Invalid email or password');
   });
+
+  it('Not login with wrong password', async () => {
+    sinon.stub(User, 'findOne').resolves(wrongPasswordUser as any);
+    sinon.stub(Token, 'sign').returns('validToken');
+    sinon.stub(Validations, 'login').returns();
+    const { status, body } = await chai.request(app)
+      .post('/login')
+      .send(isValidLoginBody);
+    expect(status).to.be.equal(401);
+    expect(body.message).to.be.equal('Invalid email or password');
+  });
+
+  it('Not login with wrong email', async () => {
+    sinon.stub(User, 'findOne').resolves(null);
+    sinon.stub(Token, 'sign').returns('validToken');
+    sinon.stub(Validations, 'login').returns();
+    const { status, body } = await chai.request(app)
+      .post('/login')
+      .send(isValidLoginBody);
+    expect(status).to.be.equal(401);
+    expect(body.message).to.be.equal('Invalid email or password');
+  });
+
+  afterEach(sinon.restore);
+});
+
+describe('Routes /login/role', async () => {
+  it('Must return role correct', async () => {
+    sinon.stub(User, 'findOne').resolves(userRegistered as any);
+    sinon.stub(Token, 'verify').returns(isValidLoginBody);
+    const { role } = userRegistered;
+    const { status, body } = await chai.request(app)
+      .get('/login/role')
+      .set('authorization', 'validToken');
+    expect(status).to.be.equal(200);
+    expect(body).to.be.deep.equal({ role });
+  });
+
+  it('Return 401 if token not found', async () => {
+    const { status, body } = await chai.request(app).get('/login/role');
+    expect(status).to.be.equal(401);
+    expect(body.message).to.be.equal('Token not found');
+  });
+
+  it('Return 401 if token is invalid', async () => {
+    sinon.stub(Token, 'verify').returns('Token must be a valid token');
+    const { status, body } = await chai.request(app)
+      .get('/login/role')
+      .set('authorization', 'invalidToken');
+    expect(status).to.be.equal(401);
+    expect(body.message).to.be.equal('Token must be a valid token');
+  });
+
+  it('Return menssagem email invalida', async () => {
+    sinon.stub(User, 'findOne').resolves(null);
+    sinon.stub(Token, 'verify').returns(isInvalidLoginBody);
+    const { status, body } = await chai.request(app)
+      .get('/login/role')
+      .set('authorization', 'invalidToken');
+    expect(status).to.be.equal(401);
+    expect(body.message).to.be.equal('Invalid email or password');
+  });
+
+  afterEach(sinon.restore);
 });

@@ -1,20 +1,25 @@
 import { Request, Response } from 'express';
-import UserService from '../services/UserService';
+import LoginService from '../services/LoginService';
+import httpStatus from '../utils/httpStatus';
 
-class UserController {
-  private userService: UserService;
-  constructor() {
-    this.userService = new UserService();
+export default class UserController {
+  constructor(
+    private userService = new LoginService(),
+  ) { }
+
+  async login(req: Request, res: Response): Promise<Response> {
+    const { status, data } = await this.userService.login(req.body);
+    if (status !== 'SUCCESSFUL') {
+      return res.status(httpStatus(status)).json(data);
+    }
+    return res.status(200).json(data);
   }
 
-  login = async (req: Request, res: Response) => {
-    const { email, password } = req.body;
-    const { message, status, token } = await this.userService.findByEmail(email, password);
-
-    if (status) return res.status(status).json({ message });
-
-    return res.status(200).json({ token });
-  };
+  async getUserRole(req: Request, res: Response): Promise<Response> {
+    const { status, data } = await this.userService.getUserRole(req.body.token.email);
+    if (status !== 'SUCCESSFUL') {
+      return res.status(httpStatus(status)).json(data);
+    }
+    return res.status(200).json({ role: data });
+  }
 }
-
-export default UserController;

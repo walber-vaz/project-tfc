@@ -1,13 +1,14 @@
-import { DataTypes, QueryInterface } from 'sequelize';
+import { DataTypes, Model, QueryInterface } from 'sequelize';
+import { IUser } from '../../api/interface/User/IUser';
 
 export default {
-  up: async (queryInterface: QueryInterface) => {
-    await queryInterface.createTable('users', {
+  up(queryInterface: QueryInterface) {
+    return queryInterface.createTable<Model<IUser>>('users', {
       id: {
         type: DataTypes.INTEGER.UNSIGNED,
-        autoIncrement: true,
-        primaryKey: true,
         allowNull: false,
+        primaryKey: true,
+        autoIncrement: true,
       },
       username: {
         type: DataTypes.STRING,
@@ -19,16 +20,16 @@ export default {
       },
       email: {
         type: DataTypes.STRING,
-        allowNull: true,
+        allowNull: false,
       },
       password: {
         type: DataTypes.STRING,
         allowNull: false,
       },
-    })
+    });
   },
 
-  down: async (queryInterface: QueryInterface) => {
-    await queryInterface.dropTable('users');
-  }
-}
+  down(queryInterface: QueryInterface) {
+    return queryInterface.dropTable('users');
+  },
+};
