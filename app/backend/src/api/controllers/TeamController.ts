@@ -4,15 +4,15 @@ import httpStatus from '../utils/httpStatus';
 
 export default class BookController {
   constructor(
-    private teamService: TeamService,
+    private teamService = new TeamService(),
   ) { }
 
-  public async getAllTeams(_req: Request, res: Response) {
+  async getAllTeams(_req: Request, res: Response) {
     const { data } = await this.teamService.getAllTeams();
     res.status(200).json(data);
   }
 
-  public async getTeamById(req: Request, res: Response) {
+  async getTeamById(req: Request, res: Response) {
     const { id } = req.params;
     const { status, data } = await this.teamService.getTeamById(Number(id));
     if (status !== 'SUCCESSFUL') {

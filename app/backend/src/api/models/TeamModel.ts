@@ -2,7 +2,7 @@ import SequelizeTeam from '../../database/models/SequelizeTeam';
 import { ITeam } from '../interface/Teams/ITeam';
 import { ITeamModel } from '../interface/Teams/ITeamModel';
 
-export default class TeamModel implements Partial<ITeamModel> {
+export default class TeamModel implements ITeamModel {
   private model = SequelizeTeam;
 
   async findAll(): Promise<ITeam[]> {
