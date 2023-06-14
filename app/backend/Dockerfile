@@ -2,11 +2,11 @@ FROM node:16.14-alpine
 
 WORKDIR /app-backend
 
-COPY package*.json ./
+COPY package*.json packages.npm ./
 
 RUN npm install
 
-COPY . .
+COPY . ./
 
 EXPOSE 3001
 
