@@ -22,6 +22,12 @@ MatchesModel.init({
     type: DataTypes.INTEGER.UNSIGNED,
     allowNull: false,
     field: 'home_team_id',
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+    references: {
+      model: 'teams',
+      key: 'id',
+    },
   },
   homeTeamGoals: {
     type: DataTypes.INTEGER.UNSIGNED,
@@ -32,6 +38,12 @@ MatchesModel.init({
     type: DataTypes.INTEGER.UNSIGNED,
     allowNull: false,
     field: 'away_team_id',
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+    references: {
+      model: 'teams',
+      key: 'id',
+    },
   },
   awayTeamGoals: {
     type: DataTypes.INTEGER.UNSIGNED,
@@ -51,9 +63,9 @@ MatchesModel.init({
 });
 
 MatchesModel.belongsTo(TeamsModel, { foreignKey: 'home_team_id', as: 'id_home_team' });
-MatchesModel.hasMany(TeamsModel, { foreignKey: 'home_team_id', as: 'id_home_team' });
+TeamsModel.hasMany(MatchesModel, { foreignKey: 'home_team_id', as: 'id_home_team' });
 
 MatchesModel.belongsTo(TeamsModel, { foreignKey: 'away_team_id', as: 'id_away_team' });
-MatchesModel.hasMany(TeamsModel, { foreignKey: 'away_team_id', as: 'id_away_team' });
+TeamsModel.hasMany(MatchesModel, { foreignKey: 'away_team_id', as: 'id_away_team' });
 
 export default MatchesModel;

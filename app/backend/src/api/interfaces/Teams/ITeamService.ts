@@ -1,4 +1,4 @@
-import TeamsModel from '../../database/models/TeamsModel';
+import TeamsModel from '../../../database/models/TeamsModel';
 
 export default interface ITeamService {
   findAll(): Promise<TeamsModel[]>;

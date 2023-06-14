@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import ITeamService from '../Interfaces/ITeamService';
+import ITeamService from '../interfaces/Teams/ITeamService';
 
 class TeamsController {
   private _service: ITeamService;
