@@ -4,7 +4,9 @@ import {
   InferAttributes,
   InferCreationAttributes,
   CreationOptional,
+  NonAttribute,
 } from 'sequelize';
+import { ITeam } from '../../api/interface/Teams/ITeam';
 import db from '.';
 import SequelizeTeam from './SequelizeTeam';
 
@@ -17,6 +19,8 @@ class Sequelizematch extends Model
   declare awayTeamId: number;
   declare awayTeamGoals: number;
   declare inProgress: boolean;
+  declare homeTeam?: NonAttribute<Partial<ITeam>>;
+  declare awayTeam?: NonAttribute<Partial<ITeam>>;
 }
 
 Sequelizematch.init({
