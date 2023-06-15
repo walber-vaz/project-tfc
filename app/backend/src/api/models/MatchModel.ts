@@ -1,6 +1,6 @@
 import Team from '../../database/models/SequelizeTeam';
 import Match from '../../database/models/SequelizeMatch';
-import { IMatchTeams } from '../interface/Match/IMatch';
+import { IMatch, IMatchTeams } from '../interface/Match/IMatch';
 import { IMatchModel } from '../interface/Match/IMatchModel';
 
 export default class MatchModel implements IMatchModel {
@@ -27,5 +27,12 @@ export default class MatchModel implements IMatchModel {
       homeTeam: m.homeTeam,
       awayTeam: m.awayTeam,
     }));
+  }
+
+  async update(id: number, updated: Partial<IMatch>): Promise<number | null> {
+    const match = await this.model.findByPk(id);
+    if (!match) return null;
+    const updatedMatch = await this.model.update(updated, { where: { id } });
+    return updatedMatch[0];
   }
 }
