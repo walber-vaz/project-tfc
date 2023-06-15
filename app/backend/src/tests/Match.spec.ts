@@ -4,8 +4,17 @@ import * as chai from 'chai';
 import chaiHttp = require('chai-http');
 import { app } from '../app';
 import Match from '../database/models/SequelizeMatch';
-import { matches, isInProgressMatches, isNotInProgressMatches } from './mocks/Match.mock';
+import { 
+  matches, 
+  isInProgressMatches, 
+  isNotInProgressMatches,
+  matchCreated,
+  matchNew,
+  matchWithEqualTeams,
+  matchWithInvalidTeams,
+} from './mocks/Match.mock';
 import Token from '../api/utils/token';
+import SequelizeTeam from '../database/models/SequelizeTeam';
 
 chai.use(chaiHttp);
 
@@ -130,6 +139,67 @@ describe('Should be able to get all matches', () => {
 
       expect(status).to.be.equal(404);
       expect(body.message).to.be.equal('Match not found');
+    });
+  });
+
+  describe('Should be able to create a match', () => {
+    it('create a match', async () => {
+      sinon.stub(Match, 'create').resolves(matchCreated as any);
+      sinon.stub(Token, 'verify').resolves();
+
+      const { status, body } = await chai.request(app)
+        .post('/matches')
+        .set('authorization', 'validToken')
+        .send(matchNew);
+
+      expect(status).to.be.equal(201);
+      expect(body).to.be.deep.equal(matchCreated);
+    });
+
+    it('return an error message if the token is not found', async () => {
+      const { status, body } = await chai.request(app)
+        .post('/matches')
+        .send(matchNew);
+
+      expect(status).to.be.equal(401);
+      expect(body.message).to.be.equal('Token not found');
+    });
+
+    it('return an error message if the token is invalid', async () => {
+      sinon.stub(Token, 'verify').returns('Token must be a valid token');
+
+      const { status, body } = await chai.request(app)
+        .post('/matches')
+        .set('authorization', 'invalidToken')
+        .send(matchNew);
+
+      expect(status).to.be.equal(401);
+      expect(body.message).to.be.equal('Token must be a valid token');
+    });
+
+    it('not be able to create a match with two equal teams', async () => {
+      sinon.stub(Token, 'verify').resolves();
+
+      const { status, body } = await chai.request(app)
+        .post('/matches')
+        .set('authorization', 'validToken')
+        .send(matchWithEqualTeams);
+
+      expect(status).to.be.equal(422);
+      expect(body.message).to.be.equal('It is not possible to create a match with two equal teams');
+    });
+
+    it('not be able to create a match with invalid teams', async () => {
+      sinon.stub(SequelizeTeam, 'findAndCountAll').resolves({ count: 0 } as any);
+      sinon.stub(Token, 'verify').resolves();
+
+      const { status, body } = await chai.request(app)
+        .post('/matches')
+        .set('authorization', 'validToken')
+        .send(matchWithInvalidTeams);
+
+      expect(status).to.be.equal(404);
+      expect(body.message).to.be.equal('There is no team with such id!');
     });
   });
 

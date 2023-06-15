@@ -32,4 +32,12 @@ export default class MatchController {
     if (status !== 'SUCCESSFUL') return res.status(httpStatus(status)).json(data);
     return res.status(200).json(data);
   }
+
+  async create(req: Request, res: Response) {
+    const { homeTeamId, awayTeamId, homeTeamGoals, awayTeamGoals } = req.body;
+    const { data, status } = await this.matchService
+      .create(homeTeamId, awayTeamId, homeTeamGoals, awayTeamGoals);
+    if (status !== 'SUCCESSFUL') return res.status(httpStatus(status)).json(data);
+    return res.status(201).json(data);
+  }
 }

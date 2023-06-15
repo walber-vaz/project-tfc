@@ -1,3 +1,4 @@
+import { Op } from 'sequelize';
 import Team from '../../database/models/SequelizeTeam';
 import Match from '../../database/models/SequelizeMatch';
 import { IMatch, IMatchTeams } from '../interface/Match/IMatch';
@@ -34,5 +35,20 @@ export default class MatchModel implements IMatchModel {
     if (!match) return null;
     const updatedMatch = await this.model.update(updated, { where: { id } });
     return updatedMatch[0];
+  }
+
+  async create(created: Omit<IMatch, 'id'>): Promise<IMatch | null> {
+    const { count } = await Team.findAndCountAll({
+      where: { id: { [Op.in]: [created.homeTeamId, created.awayTeamId] } },
+    });
+    if (count !== 2) return null;
+    const match = await this.model.create({
+      homeTeamId: created.homeTeamId,
+      awayTeamId: created.awayTeamId,
+      homeTeamGoals: created.homeTeamGoals,
+      awayTeamGoals: created.awayTeamGoals,
+      inProgress: created.inProgress,
+    });
+    return match;
   }
 }
