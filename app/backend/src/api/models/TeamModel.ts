@@ -7,7 +7,7 @@ export default class TeamModel implements ITeamModel {
 
   async findAll(): Promise<ITeam[]> {
     const data = await this.model.findAll();
-    return data.map(({ id, teamName }) => ({ id, teamName }));
+    return data.map((t) => ({ id: t.id, teamName: t.teamName }));
   }
 
   async findById(id: number): Promise<ITeam | null> {

@@ -20,7 +20,8 @@ export default class UserService {
   async login(data: ILogin): Promise<ServiceResponse<ServiceMessage | IToken>> {
     const user = await this.userModel.findByEmail(data.email);
     if (user) {
-      if (!compareSync(data.password, user.password)) {
+      const isPasswordValid = compareSync(data.password, user.password);
+      if (!isPasswordValid) {
         return unauthorizedRes;
       }
       const { email } = user as IUser;

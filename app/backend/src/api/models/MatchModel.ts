@@ -7,10 +7,8 @@ export default class MatchModel implements IMatchModel {
   private model = Match;
 
   async findAll(query?: boolean): Promise<IMatchTeams[]> {
-    let match = {};
-    if (query !== undefined) {
-      match = { inProgress: query };
-    }
+    const match = query !== undefined ? { inProgress: query } : {};
+
     const matches = await this.model.findAll({
       include: [
         { model: Team, as: 'homeTeam', attributes: ['teamName'] },
@@ -18,10 +16,16 @@ export default class MatchModel implements IMatchModel {
       ],
       where: match,
     });
-    return matches.map(({
-      id, homeTeamId, homeTeamGoals, awayTeamGoals, awayTeamId, inProgress, homeTeam, awayTeam,
-    }) => ({
-      id, homeTeamId, homeTeamGoals, awayTeamGoals, awayTeamId, inProgress, homeTeam, awayTeam,
+
+    return matches.map((m) => ({
+      id: m.id,
+      homeTeamId: m.homeTeamId,
+      homeTeamGoals: m.homeTeamGoals,
+      awayTeamGoals: m.awayTeamGoals,
+      awayTeamId: m.awayTeamId,
+      inProgress: m.inProgress,
+      homeTeam: m.homeTeam,
+      awayTeam: m.awayTeam,
     }));
   }
 }
