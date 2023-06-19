@@ -1,5 +1,5 @@
 import { ILeaderBoard } from './ILeaderBoard';
 
 export interface ILeaderBoardModel {
-  findLeaderBoard(flag: 'home' | 'away'): Promise<ILeaderBoard[]>;
+  findLeaderBoard(param: 'home' | 'away'): Promise<ILeaderBoard[]>;
 }
