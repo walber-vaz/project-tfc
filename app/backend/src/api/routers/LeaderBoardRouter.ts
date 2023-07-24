@@ -6,6 +6,11 @@ const leaderBoardController = new LeaderBoardController();
 const leaderBoardRouter = Router();
 
 leaderBoardRouter.get(
+  '/',
+  (req: Request, res: Response) => leaderBoardController.find(req, res),
+);
+
+leaderBoardRouter.get(
   '/:param',
   (req: Request, res: Response) => leaderBoardController.find(req, res),
 );

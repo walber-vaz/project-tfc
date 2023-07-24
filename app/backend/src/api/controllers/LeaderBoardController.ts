@@ -8,7 +8,7 @@ export default class LeaderBoardController {
   ) { }
 
   async find(req: Request, res: Response) {
-    const param = req.params.param as 'home' | 'away';
+    const param = req.params.param as 'home' | 'away' | undefined;
 
     const { data, status } = await this.leaderBoardService.findLeaderBoard(param);
 
@@ -16,6 +16,6 @@ export default class LeaderBoardController {
       return res.status(httpStatus(status)).json(data);
     }
 
-    res.status(200).json(data);
+    return res.status(200).json(data);
   }
 }

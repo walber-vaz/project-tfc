@@ -9,7 +9,7 @@ export default class LeaderBoardService {
   ) { }
 
   async findLeaderBoard(
-    param: 'away' | 'home',
+    param?: 'away' | 'home',
   ): Promise<ServiceResponse<ILeaderBoard[]>> {
     const leaderBoard = await this.leaderBoardModel.findLeaderBoard(param);
     return { status: 'SUCCESSFUL', data: leaderBoard };

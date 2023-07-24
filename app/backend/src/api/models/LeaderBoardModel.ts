@@ -4,15 +4,24 @@ import SequelizeMatch from '../../database/models/SequelizeMatch';
 import { ILeaderBoard, ILeaderBoardDB } from '../interface/LeaderBoard/ILeaderBoard';
 import { IMatch } from '../interface/Match/IMatch';
 import { ILeaderBoardModel } from '../interface/LeaderBoard/ILeaderBoardModel';
+import queryLoaderBoard from '../utils/queryLoaderBoard';
 
 export default class LeaderBoardModel implements ILeaderBoardModel {
   private model = SequelizeMatch;
 
-  async findLeaderBoard(param: 'home' | 'away'): Promise<ILeaderBoard[]> {
+  async findLeaderBoard(param?: 'home' | 'away'): Promise<ILeaderBoard[]> {
+    if (!param) return this.findLeaderBoard();
     const matches = param === 'home' ? await this.findHomeTeams() : await this.findAwayTeams();
     return LeaderBoardModel
       .mapLeaderBoard(matches as unknown as ILeaderBoardDB[])
       .sort(LeaderBoardModel.orderLeaderBoard);
+  }
+
+  async findAllTeams(): Promise<ILeaderBoard[]> {
+    return this.model.sequelize?.query(
+      queryLoaderBoard,
+      { type: 'SELECT' },
+    ) as unknown as ILeaderBoard[];
   }
 
   private async findHomeTeams(): Promise<IMatch[]> {
