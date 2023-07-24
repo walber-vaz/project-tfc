@@ -1,5 +1,4 @@
 {
-  "root": true,
   "env": {
     "browser": false,
     "node": true,
@@ -38,13 +37,17 @@
     "implicit-arrow-linebreak": "off",
     "consistent-return": "off",
     "@typescript-eslint/naming-convention": [
-      "error", { 
+      "error",
+      {
         "selector": "property",
-        "format": ["strictCamelCase"],
+        "format": [
+          "strictCamelCase"
+        ],
         "filter": {
-        "regex": "^_",
-        "match": false
-      } }
+          "regex": "^_",
+          "match": false
+        }
+      }
     ],
     "@typescript-eslint/no-unused-vars": [
       "error",
@@ -53,7 +56,13 @@
         "ignoreRestSiblings": true
       }
     ],
-    "@typescript-eslint/lines-between-class-members": ["error", "always", { "exceptAfterSingleLine": true }],
+    "@typescript-eslint/lines-between-class-members": [
+      "error",
+      "always",
+      {
+        "exceptAfterSingleLine": true
+      }
+    ],
     "no-unused-vars": [
       "error",
       {
