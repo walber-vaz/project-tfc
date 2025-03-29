@@ -33,7 +33,7 @@
     "camelcase": "7.0.1",
     "http-status-codes": "2.2.0",
     "jsonwebtoken": "9.0.1",
-    "puppeteer": "20.9.0",
+    "puppeteer": "24.4.0",
     "uuid": "9.0.0"
   }
 }
